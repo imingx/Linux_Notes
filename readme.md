@@ -708,7 +708,7 @@ service crond restart 重启任务调度
 
 windows分区
 
-![image-20200803190653627](https://tva1.sinaimg.cn/large/007S8ZIlly1ghdty9uk6xj31ak0j27il.jpg)
+![image-20200804001015963](https://tva1.sinaimg.cn/large/007S8ZIlly1ghe2px9m1mj31560hedsk.jpg)
 
 Linux分区  
 
