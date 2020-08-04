@@ -1,4 +1,9 @@
-[TOC]
+---
+[TOC] is used in Typora.
+---
+[TOC] 
+
+<!--GFM-TOC -->
 
 - [文件系统](#文件系统)
     - [具体的目录结构](#具体的目录结构)
@@ -17,7 +22,11 @@
     - [任务调度](任务调度)
     - [Linux磁盘分区、挂载](Linux磁盘分区、挂载)
     - [磁盘情况查询](磁盘情况查询)
+    - [网络配置](网络配置)
+    - [进程管理](进程管理)
+    - [RPM和YUM](RPM和YUM)
 
+<!--GFM-TOC -->
 
 
 `#`表示root用户
@@ -228,7 +237,7 @@ whoami 查看当前登录的用户
 
 ```
 ***运行级别***
-指令运行级别7个，在`/etc/inittab`里配置系统的运行级别
+指令运行级别7个，在`/etc/inittab`里配置系统的运行级别(centos7以上不再使用)
 0.关机
 1.单用户(找回丢失密码)
 2.多用户无网络服务
@@ -271,6 +280,7 @@ pwd[Print Working Directory],显示当前工作目录的绝对路径
 ls[list] [选项] [目录或文件]
 选项 -a[all],-A[almost all],-l[long]长格式,-h[human-readable]，文件大小带单位。
 $ ls /
+如果后面跟文件 $ ls -l 1.c 会只显示1.c的内容
 
 cd [change directory],有绝对路径和相对路径
 cd ~ 或者 cd,返回家目录
@@ -844,11 +854,455 @@ du: 无法读取目录"/home/better/.config/gnome-control-center": 权限不够
 --------------------------------------------------------------------------
 
 另外的工作使用指令
-1）统计/home文件下文件的个数
-  $ ls -l /home |grep "^-" |wc -l[lines]   ,(ls -la可以查询包括隐藏文件在内的文件)
+1）统计/home文件夹下文件的个数
+  $ ls -l /home | grep "^-" | wc -l[lines]   ,(ls -la可以查询包括隐藏文件在内的文件)
   wc -l是统计前面的行数
-  "^-"是正则表达式
+  "^-"是正则表达式，表示找以`-`开头的一行
+2) 统计/home文件夹下目录的个数
+  $ ls -l /home | grep "^d" | wc -l
+3) 统计/home文件夹下文件的个数，包括子文件夹里的
+  $ ls -lR /home | grep "^-" | wc -l
+4) 统计/home文件夹下目录的个数，包括子文件夹里的
+  $ ls -lR /home | grep "^d" | wc -l
+5) 以树状显示目录结构
+  # yum install tree
+  $ tree /home
+  如果中文无法显示，使用 $ tree -N
+  -N[ Print  non-printable  characters  as  is  instead of as
+  escaped octal numbers.]
+  -L 1 , 显示1层目录
   
   
 ```
+
+## 网络配置
+
+### 网络配置原理图
+
+NAT模式（网络环境）
+
+windows有两块网卡，一个是虚拟网卡，这个可以和linux联通，另一个是无线网卡，可以通过网关和因特网连接，这样虚拟机就可以通过本机再和因特网相连。
+
+![image-20200804104236867](https://tva1.sinaimg.cn/large/007S8ZIlly1ghekzuimq7j30qo0a2adr.jpg)
+
+### 查看网络IP和网关
+
+```
+linux&mac $ ifconfig 
+win       $ ipconfig
+在mac利用 ifconfig 可以查看vmnet8虚拟网卡的ip地址(inet)，子网掩码(netmask)
+在mac利用 ifconfig en0 可以查看本机网卡的ip地址等等
+---------------------------------------------------------------------------------
+→ ifconfig en0
+en0: flags=8863<UP,BROADCAST,SMART,RUNNING,SIMPLEX,MULTICAST> mtu 1500
+	options=400<CHANNEL_IO>
+	ether a4:83:e7:42:ce:24
+	inet6 fe80::55:1e2a:2c4d:3e%en0 prefixlen 64 secured scopeid 0x6
+	inet 192.168.1.4 netmask 0xffffff00 broadcast 192.168.1.255
+	inet6 2409:8a3c:810d:af00:1459:6faf:f263:b4da prefixlen 64 autoconf secured
+	inet6 2409:8a3c:810d:af00:edd6:d6c7:375d:eaff prefixlen 64 autoconf temporary
+	nd6 options=201<PERFORMNUD,DAD>
+	media: autoselect
+	status: active
+---------------------------------------------------------------------------------
+利用ifconfig vmnet8 查看虚拟网卡的ip
+---------------------------------------------------------------------------
+→ ifconfig vmnet8
+vmnet8: flags=8863<UP,BROADCAST,SMART,RUNNING,SIMPLEX,MULTICAST> mtu 1500
+	ether 00:50:56:c0:00:08
+	inet 172.16.104.1 netmask 0xffffff00 broadcast 172.16.104.255
+---------------------------------------------------------------------------
+
+查看虚拟网卡的网关和子网掩码
+/Library/Preferences/VMware\ Fusion/vmnet8/nat.conf 里更改
+（或者 `VMware Fusion` 这样表示是同一个文件夹名称）
+-----------------------
+# NAT gateway address
+ip = 172.16.104.2
+netmask = 255.255.255.0
+----------------------
+```
+
+### ping测试主机之间网络连通性
+
+```
+$ ping 目标主机 （测试当前服务器是否可以连接目标主机）
+
+检测主机连接命令ping:
+是一种网络检测检测工具，它主要是用检测远程主机是否正常，或是两部主机间
+的介质是否为断、网线是否脱落或网卡故障。
+如: ping对方ip地址
+```
+
+### 设置linux自动获取ip
+
+在设置中打开，但每次自动获取的ip不一定一样
+
+<img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ghenl3v0xvj30su0wan5h.jpg" alt="image-20200804121214072" style="zoom: 33%;" />
+
+### 设置linux指定ip
+
+```
+$ vim /etc/sysconfig/network-scripts/ifcfg-ens33
+重启网络服务 service network restart
+再用 ifconfig 查看ip为自己设置的ip
+------------------------------------------
+TYPE="Ethernet"
+PROXY_METHOD="none"
+BROWSER_ONLY="no"
+BOOTPROTO="static"        //静态的，默认是dhcp
+IPADDR="172.16.104.134"   //静态的ip地址（$ ifconfig查看）
+NETMASK="255.255.255.0"   //子网掩码 ($ ifconfig)
+GATEWAY="172.16.104.2"    //网关地址 ($ route -n)
+DNS1="172.16.104.2"       //DNS服务器($ cat /etc/resolv.conf)
+DEFROUTE="yes"
+IPV4_FAILURE_FATAL="no"
+IPV6INIT="yes"
+IPV6_AUTOCONF="yes"
+IPV6_DEFROUTE="yes"
+IPV6_FAILURE_FATAL="no"
+IPV6_ADDR_GEN_MODE="stable-privacy"
+NAME="ens33"
+UUID="b33ea49f-94b8-4ed1-8440-09596e61ceca"
+DEVICE="ens33"
+ONBOOT="yes"              //自动启动
+------------------------------------------
+
+```
+
+## 进程管理
+
+1)在LINUX中，每个执行的程序(代码)都称为一个进程。每一个进程都分配-一个ID号。  
+2)每一个进程，都会对应一个父进程，而这个父进程可以复制多个子进程。例如www服务器。  
+3)每个进程都可能以两种方式存在的。前台与后台，所谓前台进程就是用户目前的屏幕上可以进行操作的。后台进程则是实际在操作，但由于屏幕上无法看到的进程，通常使用后台方式执行。  
+4)一般系统的服务都是以后台进程的方式存在，而且都会常驻在系统中。直到关机才才结束。  
+
+### 查看进程
+
+```
+ps[processes snapshot]指令可查看目前系统的软件执行情况，可以不加参数
+ps可显示
+PID    进程识别号
+TTY    终端机号
+TIME   此进程所占用CPU时间
+CMD    正在执行的命令或进程名
+选项
+-a 显示当前终端的所有进程信息
+-u 以用户的格式显示进程信息
+-x 显示后台进程运行的参数
+
+$ ps -aux
+---
+用户名      进程id 
+ |           |  占用的cpu 
+ |           |   | 占用内存 使用的虚拟内存（单位KB）
+ |           |   |    |      |  使用的物理内存（单位KB）
+ |           |   |    |      |     |  使用的终端 进程的状态`S:休眠,R:运行`
+ |           |   |    |      |     |   |       |  启动时间 占用cpu时间 进程执行时命令行
+ |           |   |    |      |     |   |       |    |       |        |
+USER        PID %CPU %MEM    VSZ   RSS TTY    STAT START   TIME COMMAND
+root        2   0.0  0.0     0     0   ?      S    06:10   0:00 [kthreadd]
+---
+更具体的，STAT进程状态，有很多
+S 睡眠，s 表示该进程是会话的先导进程，N表示进程拥有比普通优先级更低的优先级
+R 正在运，D 短期等等，Z僵死进程，T 被跟踪或者被停止
+
+利用grep过滤
+$ ps -aux|grep xxx ，注意这条指令也会被算进进程
+
+$ ps -ef  查看进程的父进程
+`UID         PID   PPID  C STIME TTY          TIME CMD` PPID为父进程id
+查找父进程 $ ps -ef | grep sshd
+
+```
+
+### 终止进程
+
+```
+kill & killall
+
+kill [选项] 进程号（通过进程号杀死进程）
+-9 强迫进程终止
+
+killall 进程名称(通过进程名来杀死进程，支持通配符，在负载过大而变慢时使用)
+通配符如 A* 表示以A开头的进程
+
+应用
+1)踢掉某个非法用户
+  先 ps -aux | grep sshd
+  再`better 25675 0.0 0.1 161012  2384 ?  S    13:06   0:00 sshd: better@pts/0`
+  其中pts/0表示[pseudoterminal master and slave]，伪终端的意思
+  查看进程id，25675，kill 25675即可。
+2)终止远程登录服务sshd，然后重启sshd服务
+  通过 ps -aux | grep sshd
+  `root   1154  0.0  0.2 112924 4352 ?  Ss  06:10 0:00 /usr/sbin/sshd -D`
+  $ kill 1154
+  重启  service sshd restart
+3)终止多个gedit编辑器
+  killadll gedit
+4)强制杀掉一个终端
+  $ kill -9 xxxx 
+```
+
+### 查看进程树
+
+```
+pstree [选项],更加直观的来看进程信息
+-p 显示进程PID
+-u 显示进程的所属用户
+```
+
+### 服务管理
+
+服务的本质就是进程，但是是运行在后台的，通常都会监听某个端口，等待其他程序的请求，比如(mysql-3306、sshd-22、防火墙等)，因此我们又称之为守护进程  
+
+```
+service管理指令
+service 服务名 [start|stop|restart|reload|status]
+在Centos7.0后 不再使用service，而是systemctl
+systemctl [start|stop|restart|reload|status] 服务名
+
+案例
+1)查看防火墙状态、重启、关闭
+ $ systemctl status firewalld   |  $ service iptables status 
+ $ systemctl stop   firewalld   |  $ service iptables stop 
+ $ systemctl start  firewalld   |  $ service iptables start
+另外，这种关闭的方式仅仅临时生效，重启系统后，回归以前的设置。
+如果要永久关闭或启动，利用chkconfig指令。
+
+2)其中telnet指令可以检查linux的某个端口是否在监听，并且可以访问
+ telnet ip 端口
+ telnet 172.16.xxx.xxx 22 显示`SSH-2.0-OpenSSH_7.4`即可
+ 
+查看服务名
+方式1，使用setup, 找到自己的系统服务。
+方式2，ls -l /etc/init.d/ 注意最后加`/`
+   然而在centos7以上，在另一个地方，ls -l /usr/lib/systemd/
+   
+
+服务的运行级别（runlevel）
+查看或者修改默认级别， vim /etc/inittab（centos7以上不再使用），以下为centos7内容
+------------------------------------------------------------------------
+# inittab is no longer used when using systemd.
+# systemd uses 'targets' instead of runlevels. By default, there are two main 
+targets:
+#
+# multi-user.target: analogous to runlevel 3
+# graphical.target: analogous to runlevel 5
+#
+# To view current default target, run:
+# systemctl get-default
+#
+# To set a default target, run:
+# systemctl set-default TARGET.target
+------------------------------------------------------------------------
+```
+
+![image-20200804163734908](https://tva1.sinaimg.cn/large/007S8ZIlly1ghev98rxixj30xu0ewqei.jpg)
+
+```
+开机流程
+开机—>BIOS->/boot->init进程->运行级别->运行级对应的服务
+```
+
+```
+chkconfig指令，设置完后重启才能生效
+通过chkconfig指令可以给每个服务的各个运行级别设置自启动/关闭
+基本语法
+1)查看服务 chkconfig --list | grep xxx
+2)chkconfig xxx --list ,跟1）一样
+3)chkconfig --level 5 服务名 on/off ，在某个运行级别下启动/不启动
+  不写`--level 5`表示在所有级别下
+
+---------------------------------------------------------- 
+$ chkconfig --list (centos 7 以上显示以下内容,target就是runlevel)
+注：该输出结果只显示 SysV 服务，并不包含
+原生 systemd 服务。SysV 配置数据
+可能被原生 systemd 配置覆盖。
+
+      要列出 systemd 服务，请执行 'systemctl list-unit-files'。
+      查看在具体 target 启用的服务请执行
+      'systemctl list-dependencies [target]'。
+-----------------------------------------------------------
+所以在centos7及以上
+使用$ systemctl list-unit-files | grep sshd 来查看
+```
+
+### 进程监控
+
+```
+动态监控进程
+
+top指令，top和ps命令很相似，它们都用来显示正在执行的进程。Top与ps最大的不同之处，在于top
+在执行一段时间可以更新正在运行的进程
+top [选项]
+-------------------------------------------
+-d 秒数   指定top每隔几秒刷新，默认3秒
+-i       使top不显示任何闲置或者僵死进程  
+-p       通过指定监控进程ID来仅仅监控某个进程状态
+-------------------------------------------
+交互操作(大写)
+---------------------------
+P     以CPU使用率排序（默认）
+M     以内存的使用率排序
+N     以PID排序
+q     退出top
+---------------------------
+显示内容为以下
+-----------------------------------------------------------------------
+top - 17:23:09 up 10:04,  2 users,  load average: 0.01, 0.02, 0.05
+Tasks: 217 total,   2 running, 215 sleeping,   0 stopped,   0 zombie
+%Cpu(s):  0.2 us,  0.2 sy,  0.0 ni, 99.7 id,  0.0 wa,  0.0 hi,  0.0 si,0.0 st
+KiB Mem :  1863040 total,   144728 free,   813728 used,   904584 buff/cache
+KiB Swap:  2097148 total,  2096884 free,      264 used.   845844 avail Mem
+
+   PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+
+  2655 better    20   0  642816  28540  19860 S   0.3  1.5   1:04.41
+-----------------------------------------------------------------------
+
+各名词解释
+-----------------------------------------------------------------------
+
+17:23:09        当前时间
+up 10:04        系统运行时间，时:分
+2 users         登录的用户数
+
+load average    系统负载，即任务队列的平均长度，三个数值分别是
+0.01,0.02,0.05  1、5、15分钟到目前的平均值
+
+Task:217 total  进程总数
+2 running       正在运行的进程数
+215 sleeping    睡眠的进程数
+0 stopped       停止的进程数
+0 zombie        僵尸进程数
+0.2 us          用户空间占用CPU百分比
+0.2 sy          内核空间占用CPU百分比
+0.0 ni          用户进程空间内改变过优先级的进程占用CPU百分比
+99.7 id         空闲CPU百分比
+0.0 wa          等待输入输出的CPU时间百分比
+0.0 hi          硬中断（Hardware IRQ）占用CPU的百分比
+0.0 si          软中断（Software Interrupts）占用CPU的百分比
+0.0 st   
+KiB Mem:x total 物理内存总量
+x free          空闲内存总量        | 空闲交换区总量
+x used          使用的物理内存总量   | 使用的交换区总量
+x buff/cache    用作内核缓存的内存量  
+KiB Swap:xtotal 交换区总量
+x avail Mem     代表可用于进程下一次分配的物理内存数量
+-----------------------------------------------------------------------
+PID	    进程id
+PPID	父进程id
+RUSER	Real user name
+UID	    进程所有者的用户id
+USER	进程所有者的用户名
+GROUP	进程所有者的组名
+TTY	    启动进程的终端名。不是从终端启动的进程则显示为 ?
+PR	    优先级
+NI	    nice值。负值表示高优先级，正值表示低优先级
+P	    最后使用的CPU，仅在多CPU环境下有意义
+%CPU	上次更新到现在的CPU时间占用百分比
+TIME	进程使用的CPU时间总计，单位秒
+TIME+	进程使用的CPU时间总计，单位1/100秒
+%MEM	进程使用的物理内存百分比
+VIRT	进程使用的虚拟内存总量，单位kb。VIRT=SWAP+RES
+SWAP	进程使用的虚拟内存中，被换出的大小，单位kb
+RES 	进程使用的、未被换出的物理内存大小，单位kb。RES=CODE+DATA
+CODE	可执行代码占用的物理内存大小，单位kb
+DATA	可执行代码以外的部分(数据段+栈)占用的物理内存大小，单位kb
+SHR	    共享内存大小，单位kb
+nFLT	页面错误次数
+nDRT	最后一次写入到现在，被修改过的页面数。
+S  		进程状态。D=不可中断的睡眠状态 R=运行 S=睡眠 T=跟踪/停止 Z=僵尸进程
+COMMAND	命令名/命令行
+WCHAN	若该进程在睡眠，则显示睡眠中的系统函数名
+Flags	任务标志
+-----------------------------------------------------------------------
+
+top翻页按键
+shift+<、shift+>，好像不太完备
+
+案例
+1) 监视特定用户
+  top执行后，按`u`，再输入用户名，确定
+2) 终止指定的进程
+  输入`k`,输入PID即可  
+```
+
+```
+监控网络状态
+netstat [选项]
+-an 按一定顺序排列输出
+-p  显示哪个进程在调用
+$ netstat -anp，查看所有的
+$ netstat -anp | grep sshd
+```
+
+## RPM和YUM
+
+### RPM包的管理
+
+```
+介绍：
+一种用于互联网下载包的打包及安装工具，它包含在某些Linux分发版中。它生成
+具有.RPM扩展名的文件。RPM是RedHat Package Manager ( RedHat软件包管理工
+中具)的缩写，类似windows的setup.exe，这一文件格式名称虽然打上了RedHat的
+标志，但理念是通用的。
+Linux的分发版本都有采用(suse,redhat, centos 等等)，可以算是公认的行业标
+准了。
+
+rpm包的简单查询指令：
+$ rpm -qa | less      查询所安装的所有rpm软件包
+$ rpm -qa | grep xx   查询某个软件是否安装
+$ rpm -q  软件包名     查询软件包是否安装
+$ rpm -qi 软件包名     查询软件包信息
+$ rpm -ql 软件包名     查询软件包中的文件
+$ rpm -qf 文件全路径名  查询文件所属的软件包
+|
+ rpm -qf /etc/passwd
+ rpm -qf /root/install.log
+ 
+--
+$ rpm -qa | grep firefox
+firefox-68.5.0-2.el7.centos.x86_64
+--
+
+rpm包名基本格式: 
+一个rpm包名: firefox-68.5.0-2.el7.centos.x86_64
+名称:firefox
+版本号: 68.5.0-2
+适用操作系统: el7.centos.x86_64
+表示centos7.x的64位系统
+如果是i686、i386表示32位系统，noarch表示通用。
+
+
+卸载rpm包
+rpm -e RPM包的名称
+如果要卸载的rpm包是其他软件包所依赖的，那么卸载会产生错误
+如果要强制卸载，就要 rpm -e --nodeps foo
+
+安装rpm包
+rpm -ivh RPM包全路径名称
+-i[install] 安装
+-v[verbos]  提示
+-h[hash]    进度条
+
+步骤，先找到rpm包，挂载上安装centos的iso文件，然后到/media/去找rpm包
+然后 cp firefox-68.5.0-2.el7.centos.x86_64.rpm /opt/
+进入/opt/然后 rpm -ivh firefox-68.5.0-2.el7.centos.x86_64.rpm
+即可
+```
+
+### YUM
+
+```
+Yum是一个shell前端软件包管理器，基于RPM包管理，能够从指定的服务器自动下载RPM包安装
+可以自动处理依赖性关系，并且一次安装所以依赖的软件包
+
+- yum可以自己设置镜像，更改yum源，待办
+基本指令
+$ yum list | grep xx  查询yum服务器是否有需要的软件
+$ yum install xxx     下载安装指定yum包，默认安装最新版的
+```
+
+
 
