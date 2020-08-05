@@ -1,8 +1,8 @@
-### 前言
+## 前言📣
 
-本Linux笔记的课程源自b站的尚硅谷，主讲人为韩顺平老师。在此感谢老师和尚硅谷官方，视频链接在这里[\^-^](https://www.bilibili.com/video/BV1dW411M7xL)。
+本Linux笔记的课程源自b站的尚硅谷，主讲人为韩顺平老师。在此感谢韩老师和尚硅谷官方，视频链接在这里[🎈\^_^](https://www.bilibili.com/video/BV1dW411M7xL)。
 
-### 注意
+## 注意🦋
 
 `#`表示root用户
 
@@ -15,6 +15,8 @@ centOS安装文件用的是`yum`命令
 `ctrl+z`将任务中止（暂停）
 
 `ctrl+d`表示EOF
+
+---
 
 
 
