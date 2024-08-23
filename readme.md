@@ -89,7 +89,7 @@ ctrl+d[down] 下移半屏
 
 Linux操作系统具有一定层次结构，由若干目录和子目录组成，不同于windows操作系统，Linux只有一个根目录，用“/”表示，它采用的是**级层式的树形结构**。
 ----*在Linux世界里，一切皆文件。*
-![在这里插入图片描述](https://tva1.sinaimg.cn/large/007S8ZIlly1ghahadx3sjj30ml0bcq4k.jpg)
+![在这里插入图片描述](https://gitlab.com/imingx/picgo/-/raw/main/2024/202408232047276.jpg)
 
 ### 具体的目录结构
 
@@ -703,7 +703,7 @@ service crond restart 重启任务调度
 */n   代表每隔多久执行一次， */1和*效果一样
 ```
 
-![image-20200803162445685](https://tva1.sinaimg.cn/large/007S8ZIlly1ghdp9lyw0qj313e0i0amw.jpg)
+![image-20200803162445685](https://gitlab.com/imingx/picgo/-/raw/main/2024/202408232048717.jpg)
 
 ```
 任务调度的应用
@@ -732,7 +732,7 @@ service crond restart 重启任务调度
 
 windows分区
 
-![image-20200804001015963](https://tva1.sinaimg.cn/large/007S8ZIlly1ghe2px9m1mj31560hedsk.jpg)
+![image-20200804001015963](https://gitlab.com/imingx/picgo/-/raw/main/2024/202408232049675.jpg)
 
 Linux分区  
 
@@ -740,7 +740,7 @@ Linux来说无论有几个分区，分给哪一目录使用，它归根结底就
 Linux采用了一种叫“载入”的处理方法，它的整个文件系统中包含了一整套的文件和目录，且将一个分区和一个目录联系起来。这时要载入的一个分区将使它的存储空间在一个目录获得。  
 
 
-![image-20200803191629543](https://tva1.sinaimg.cn/large/007S8ZIlly1ghdu89gtlbj31c20r47hl.jpg)
+![image-20200803191629543](https://gitlab.com/imingx/picgo/-/raw/main/2024/202408232049027.jpg)
 
 硬盘说明
 1)   Linux硬盘分IDE硬盘和SCSI硬盘，目前基本上是SCSI硬盘  
@@ -772,7 +772,7 @@ sr0              11:0    1  4.5G  0 rom  /run/media/better/CentOS 7 x86
 --------------------------------------------------------------------------
 ```
 
-![image-20200803193315870](https://tva1.sinaimg.cn/large/007S8ZIlly1ghdupojmhqj31ee0kekab.jpg)
+![image-20200803193315870](https://gitlab.com/imingx/picgo/-/raw/main/2024/202408232050481.jpg)
 
 ```
 挂载案例
@@ -790,7 +790,7 @@ sr0              11:0    1  4.5G  0 rom  /run/media/better/CentOS 7 x86
 
 ```
 
-![image-20200803201327105](https://tva1.sinaimg.cn/large/007S8ZIlly1ghdvvierbgj30pm0bc451.jpg)
+![image-20200803201327105](https://gitlab.com/imingx/picgo/-/raw/main/2024/202408232051761.jpg)
 
 
 
@@ -879,7 +879,7 @@ NAT模式（网络环境）
 
 windows有两块网卡，一个是虚拟网卡，这个可以和linux联通，另一个是无线网卡，可以通过网关和因特网连接，这样虚拟机就可以通过本机再和因特网相连。
 
-![image-20200804104236867](https://tva1.sinaimg.cn/large/007S8ZIlly1ghekzuimq7j30qo0a2adr.jpg)
+![image-20200804104236867](https://gitlab.com/imingx/picgo/-/raw/main/2024/202408232051184.jpg)
 
 ### 查看网络IP和网关
 
@@ -934,7 +934,7 @@ $ ping 目标主机 （测试当前服务器是否可以连接目标主机）
 
 在设置中打开，但每次自动获取的ip不一定一样
 
-<img src="https://tva1.sinaimg.cn/large/007S8ZIlly1ghenl3v0xvj30su0wan5h.jpg" alt="image-20200804121214072" style="zoom: 33%;" />
+<img src="https://gitlab.com/imingx/picgo/-/raw/main/2024/202408232051912.jpeg" alt="image-20200804121214072" style="zoom: 33%;" />
 
 ### 设置linux指定ip
 
@@ -1094,7 +1094,7 @@ targets:
 ------------------------------------------------------------------------
 ```
 
-![image-20200804163734908](https://tva1.sinaimg.cn/large/007S8ZIlly1ghev98rxixj30xu0ewqei.jpg)
+![image-20200804163734908](https://gitlab.com/imingx/picgo/-/raw/main/2024/202408232052186.jpg)
 
 ```
 开机流程
